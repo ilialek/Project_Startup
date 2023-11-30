@@ -16,11 +16,29 @@ public class PlayerMovement : NetworkBehaviour
     public LayerMask whatIsGround;
     public bool isGrounded;
 
+    [Header("Other settings")]
+    public Camera sceneCamera;
+
+    public Transform headTransform;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
+
+
+        //if (IsOwner)
+        //{
+        //    sceneCamera = Camera.main;
+
+        //    if (sceneCamera != null)
+        //    {
+        //        sceneCamera.enabled = false;
+        //    }
+        //}
+
+        SetupPlayerCamera();
+
     }
 
 
@@ -38,7 +56,25 @@ public class PlayerMovement : NetworkBehaviour
         GroundMovement();
     }
 
+    void SetupPlayerCamera()
+    {
+        if (!IsOwner) { return; }
+        if (headTransform != null)
+        {
+            // Set camera position to the head
+            Camera.main.transform.position = headTransform.position;
 
+            // Look at a point in front of the player
+            Camera.main.transform.LookAt(transform.position + transform.forward * 30);
+
+            // Set the player as the parent of the camera
+            Camera.main.transform.parent = headTransform;
+        }
+        else
+        {
+            Debug.LogError("Head transform not found. Please ensure the 'Head' transform exists.");
+        }
+    }
 
     void GroundMovement()
     {
@@ -89,5 +125,5 @@ public class PlayerMovement : NetworkBehaviour
             rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
         }
     }
-
+    
 }

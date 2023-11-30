@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
-public class MouseAim : MonoBehaviour
+public class MouseAim : NetworkBehaviour
 {
 
     public float mouseSensitivity = 100f;
@@ -14,11 +15,19 @@ public class MouseAim : MonoBehaviour
     void Awake()
     {
         Cursor.lockState = CursorLockMode.Locked;
+
+        //if (IsOwner)
+        //{
+        //    // Set the camera owner to the local player
+        //    Camera.main.GetComponent<NetworkObject>().ChangeOwnership(OwnerClientId);
+        //}
     }
 
 
     void Update()
     {
+        if (!IsOwner) { return; }
+
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
 
