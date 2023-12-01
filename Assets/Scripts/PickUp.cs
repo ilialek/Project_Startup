@@ -1,10 +1,14 @@
 using UnityEngine;
 using TMPro;
+using Unity.VisualScripting;
 
 public class PickUp : MonoBehaviour
 {
     public float pickUpRange = 3.0f;
+
     public LayerMask pickUpLayerMask;
+    public LayerMask caseLayerMask;
+
     private Camera playerCamera;
     private GameObject heldItem;
     public Transform pickUpPoint;
@@ -21,27 +25,40 @@ public class PickUp : MonoBehaviour
 
     void Update()
     {
+        // Guide Text and raycast
+        /////////////////////////
+        guideText.text = "";
+
         ray = playerCamera.ScreenPointToRay(Input.mousePosition);
 
         if (Physics.Raycast(ray, out hit, pickUpRange, pickUpLayerMask))
-        {
-            if (hit.transform.gameObject.layer == pickUpLayerMask.value)
-            {
-                guideText.text = "Press E to pick up";
-            }
+        {         
+            guideText.text = "Press E to pick up";          
         }
 
+        if (Physics.Raycast(ray, out hit, pickUpRange, caseLayerMask))
+        {
+            guideText.text = "Hold E to open";
+        }
+        /////////////////////////
+        /////////////////////////
+        
         if (Input.GetKeyDown(KeyCode.E))
         {
-            pickUpItem();
+            PickUpItem();
         }
         else if (Input.GetKeyDown(KeyCode.G))
         {
-            dropItem();
+            DropItem();
+        }
+
+        if (Input.GetKey(KeyCode.E)) 
+        {
+            OpenCase();
         }
     }
 
-    void pickUpItem()
+    void PickUpItem()
     {
         if (Physics.Raycast(ray, out hit, pickUpRange, pickUpLayerMask))
         {
@@ -61,7 +78,7 @@ public class PickUp : MonoBehaviour
         }
     }
 
-    void dropItem()
+    void DropItem()
     {
         if (heldItem != null)
         {
@@ -70,6 +87,14 @@ public class PickUp : MonoBehaviour
             heldItem.GetComponent<Rigidbody>().useGravity = true;
             heldItem.transform.SetParent(null);
             heldItem = null;
+        }
+    }
+
+    void OpenCase()
+    {
+        if (Physics.Raycast(ray, out hit, pickUpRange, caseLayerMask))
+        {
+             
         }
     }
 }
