@@ -1,70 +1,75 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Security.Cryptography;
-
 using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
-using UnityEngine.UIElements;
 
 public class PickUp : MonoBehaviour
 {
     public float pickUpRange = 3.0f;
-
     public LayerMask pickUpLayerMask;
-
     private Camera playerCamera;
-
     private GameObject heldItem;
-
     public Transform pickUpPoint;
+    public TMP_Text guideText;
+    private Ray ray;
+    private RaycastHit hit;
 
     void Start()
     {
-        //UnityEngine.Cursor.lockState = CursorLockMode.Locked;
-        //UnityEngine.Cursor.visible = false;
+        UnityEngine.Cursor.lockState = CursorLockMode.Locked;
+        UnityEngine.Cursor.visible = false;
         playerCamera = GetComponentInChildren<Camera>();
     }
 
-    private void Update()
+    void Update()
     {
-        if (Input.GetKeyDown(KeyCode.E)) 
+        ray = playerCamera.ScreenPointToRay(Input.mousePosition);
+
+        if (Physics.Raycast(ray, out hit, pickUpRange, pickUpLayerMask))
         {
-            if (heldItem == null) 
+            if (hit.transform.gameObject.layer == pickUpLayerMask.value)
             {
-                pickUpItem();
+                guideText.text = "Press E to pick up";
             }
         }
 
-        else if (Input.GetKeyDown(KeyCode.G)) 
+        if (Input.GetKeyDown(KeyCode.E))
         {
-            if (heldItem != null)
-            {
-                dropItem();
-            }
+            pickUpItem();
+        }
+        else if (Input.GetKeyDown(KeyCode.G))
+        {
+            dropItem();
         }
     }
 
     void pickUpItem()
     {
-        Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
-
         if (Physics.Raycast(ray, out hit, pickUpRange, pickUpLayerMask))
         {
-            heldItem = hit.collider.gameObject;
-            heldItem.GetComponent<Rigidbody>().isKinematic = true;
-            heldItem.transform.SetParent(pickUpPoint.transform);
-            heldItem.transform.rotation = Quaternion.identity;
-            heldItem.transform.position = pickUpPoint.position;
+            GameObject selectedItem = hit.transform.gameObject;
+
+            if (selectedItem != null)
+            {
+                selectedItem.GetComponent<Collider>().enabled = false;
+                selectedItem.GetComponent<Rigidbody>().isKinematic = true;
+                selectedItem.GetComponent<Rigidbody>().useGravity = false;
+                selectedItem.transform.localScale = Vector3.one;
+                selectedItem.transform.position = Vector3.zero;
+                selectedItem.transform.rotation = Quaternion.identity;
+                selectedItem.transform.SetParent(pickUpPoint, false);
+                heldItem = selectedItem;
+            }
         }
     }
 
     void dropItem()
     {
-        heldItem.GetComponent<Rigidbody>().isKinematic = false;
-        heldItem.transform.SetParent(null);
-        heldItem = null;
+        if (heldItem != null)
+        {
+            heldItem.GetComponent<Collider>().enabled = true;
+            heldItem.GetComponent<Rigidbody>().isKinematic = false;
+            heldItem.GetComponent<Rigidbody>().useGravity = true;
+            heldItem.transform.SetParent(null);
+            heldItem = null;
+        }
     }
 }
