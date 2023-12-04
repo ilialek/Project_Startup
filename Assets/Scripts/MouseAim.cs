@@ -23,10 +23,11 @@ public class MouseAim : NetworkBehaviour
         //}
     }
 
-
     void Update()
     {
-        //if (!IsOwner) { return; }
+
+         if (!IsOwner) { return; }
+
 
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;

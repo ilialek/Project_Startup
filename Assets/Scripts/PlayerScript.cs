@@ -1,10 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
-public class PlayerScript : MonoBehaviour
+public class PlayerScript : NetworkBehaviour
 {
-    Camera camera;
+    public Camera playerCamera;
     Rigidbody rb;
 
     [Header("Ground movement and jump settings")]
@@ -26,12 +27,15 @@ public class PlayerScript : MonoBehaviour
 
     public bool isAiming = false;
 
+    [Header("Other settings")]
+    public Transform headTransform;
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
 
-        camera = Camera.main;
+        //camera = Camera.main;
 
         int numberOfActivatedWeapons = 0;
         GameObject activatedWeapon = null;
@@ -53,11 +57,28 @@ public class PlayerScript : MonoBehaviour
         {
             currentWeapon = activatedWeapon;
         }
+
+        // Check if the player is the local player
+        if (IsLocalPlayer)
+        {
+            // Enable the camera for the local player
+            playerCamera.enabled = true;
+        }
+        else
+        {
+            // Disable the camera for non-local players
+            playerCamera.enabled = false;
+        }
+
+        //SetupPlayerCamera();
+
     }
 
 
     void Update()
     {
+        if (!IsOwner) { return; }
+
         JumpAndDrag();
         SpeedControl();
 
@@ -73,8 +94,39 @@ public class PlayerScript : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (!IsOwner) { return; }
+
         GroundMovement();
     }
+
+    public override void OnGainedOwnership()
+    {
+        // Called when the local player gains ownership of the object
+        if (IsLocalPlayer)
+        {
+            // Enable the camera for the local player
+            playerCamera.enabled = true;
+        }
+    }
+
+    //void SetupPlayerCamera()
+    //{
+    //    if (!IsOwner) { return; }
+    //    if (headTransform != null)
+    //    {
+    //        // Set camera position to the head
+    //        Camera.main.transform.position = headTransform.position;
+
+    //        Camera.main.transform.LookAt(transform.position + transform.forward * 30);
+
+    //        // Set the player as the parent of the camera
+    //        Camera.main.transform.parent = headTransform;
+    //    }
+    //    else
+    //    {
+    //        Debug.LogError("Head transform not found. Please ensure the 'Head' transform exists.");
+    //    }
+    //}
 
     public void SwitchWeapons()
     {
