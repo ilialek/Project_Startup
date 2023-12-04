@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.VFX;
 using TMPro;
+using Unity.Netcode;
 
-public class Gun : MonoBehaviour
+public class Gun : NetworkBehaviour
 {
     public float damage = 10f;
     public float range = 100f;
@@ -47,6 +48,8 @@ public class Gun : MonoBehaviour
 
     void Update()
     {
+        if (!IsOwner) { return; }
+
         ammoText.text = amountOfBulletsInMagazine.ToString() + " / " + amountOfBullets.ToString();
 
         if (!playerScript.isSwitchingWeapons)
@@ -99,10 +102,10 @@ public class Gun : MonoBehaviour
 
         RaycastHit hit;
 
-        if (Physics.Raycast(fpsCamera.transform.position, fpsCamera.transform.forward, out hit, range))
-        {
+        //if (Physics.Raycast(fpsCamera.transform.position, fpsCamera.transform.forward, out hit, range))
+        //{
 
-        }
+        //}
     }
 
     void PlayTheSound(AudioClip audioClip, float volume)

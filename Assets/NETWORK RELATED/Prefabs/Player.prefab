@@ -416,7 +416,7 @@ Canvas:
   serializedVersion: 3
   m_RenderMode: 1
   m_Camera: {fileID: 3483855160679575220}
-  m_PlaneDistance: 0.6
+  m_PlaneDistance: 0.1
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
   m_OverrideSorting: 0
@@ -664,14 +664,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3483855159208170279}
-  m_LocalRotation: {x: 0, y: -1, z: 0, w: 0}
-  m_LocalPosition: {x: 0.031, y: 0.746, z: 1.222}
-  m_LocalScale: {x: 1.4999999, y: 1.4999999, z: 1.4999999}
+  m_LocalRotation: {x: -1.1641531e-10, y: -1, z: -0, w: 0}
+  m_LocalPosition: {x: 0.02214286, y: 0.5328572, z: 0.8728565}
+  m_LocalScale: {x: 1.0714285, y: 1.0714288, z: 1.0714283}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 3483855159620449734}
-  m_Father: {fileID: 3483855160762098181}
-  m_RootOrder: 1
+  m_Father: {fileID: 4022728982385551652}
+  m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: -180, z: 0}
 --- !u!1 &3483855159303285987
 GameObject:
@@ -798,7 +798,7 @@ GameObject:
   - component: {fileID: 3483855159510549999}
   - component: {fileID: 3483855159510549998}
   - component: {fileID: 7305244686915189978}
-  - component: {fileID: 7058892112013588989}
+  - component: {fileID: 8565781280837644013}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -915,6 +915,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 673ce6ca629f94697843228f588c5e14, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerCamera: {fileID: 3483855160679575220}
   speed: 10
   groundDrag: 5
   airFriction: 0.5
@@ -931,6 +932,7 @@ MonoBehaviour:
   - {fileID: 3483855159959518871}
   isSwitchingWeapons: 0
   isAiming: 0
+  headTransform: {fileID: 0}
 --- !u!114 &3483855159510549998
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -966,12 +968,12 @@ MonoBehaviour:
   SyncPositionX: 1
   SyncPositionY: 1
   SyncPositionZ: 1
-  SyncRotAngleX: 1
+  SyncRotAngleX: 0
   SyncRotAngleY: 1
-  SyncRotAngleZ: 1
-  SyncScaleX: 1
-  SyncScaleY: 1
-  SyncScaleZ: 1
+  SyncRotAngleZ: 0
+  SyncScaleX: 0
+  SyncScaleY: 0
+  SyncScaleZ: 0
   PositionThreshold: 0.001
   RotAngleThreshold: 0.01
   ScaleThreshold: 0.01
@@ -981,7 +983,7 @@ MonoBehaviour:
   InLocalSpace: 0
   Interpolate: 1
   SlerpPosition: 0
---- !u!114 &7058892112013588989
+--- !u!114 &8565781280837644013
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1471,7 +1473,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4022728982385551652}
-  - {fileID: 3483855159208170278}
   m_Father: {fileID: 3483855160665912305}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: -4.71, y: -4.43, z: 0}

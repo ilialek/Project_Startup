@@ -17,25 +17,12 @@ public class PlayerMovement : NetworkBehaviour
     public bool isGrounded;
 
     [Header("Other settings")]
-    public Camera sceneCamera;
-
     public Transform headTransform;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
-
-
-        //if (IsOwner)
-        //{
-        //    sceneCamera = Camera.main;
-
-        //    if (sceneCamera != null)
-        //    {
-        //        sceneCamera.enabled = false;
-        //    }
-        //}
 
         SetupPlayerCamera();
 
