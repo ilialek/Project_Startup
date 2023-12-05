@@ -1,13 +1,17 @@
 using UnityEngine;
 using TMPro;
 using Unity.VisualScripting;
+using System;
+using UnityEngine.UI;
 
-public class PickUp : MonoBehaviour
+public class PickUp : MonoBehaviour 
 {
     public float pickUpRange = 3.0f;
 
     public LayerMask pickUpLayerMask;
     public LayerMask caseLayerMask;
+
+    public Slider chestSlider;
 
     private Camera playerCamera;
     private GameObject heldItem;
@@ -15,15 +19,23 @@ public class PickUp : MonoBehaviour
     public TMP_Text guideText;
     private Ray ray;
     private RaycastHit hit;
+    private bool isOpeningCase = false;
+    private float holdTimer;
+    private float requiredHoldTime = 1.5f;
 
+    private Chest currentChest;
+
+    public bool lookingAtItem = false;
+    public bool lookingAtCase = false;
     void Start()
     {
         UnityEngine.Cursor.lockState = CursorLockMode.Locked;
         UnityEngine.Cursor.visible = false;
         playerCamera = GetComponentInChildren<Camera>();
+        chestSlider.gameObject.SetActive(false);
     }
 
-    void Update()
+    private void Update()
     {
         // Guide Text and raycast
         /////////////////////////
@@ -32,14 +44,35 @@ public class PickUp : MonoBehaviour
         ray = playerCamera.ScreenPointToRay(Input.mousePosition);
 
         if (Physics.Raycast(ray, out hit, pickUpRange, pickUpLayerMask))
-        {         
+        {
+            lookingAtItem = true;
             guideText.text = "Press E to pick up";          
+        }
+        else
+        {
+            lookingAtItem = false;
         }
 
         if (Physics.Raycast(ray, out hit, pickUpRange, caseLayerMask))
         {
-            guideText.text = "Hold E to open";
+            lookingAtCase = true;
+            Chest chest = hit.transform.GetComponent<Chest>();
+            if (chest != null ) 
+            {
+                if(!chest.IsOpened) 
+                {
+                   
+                    guideText.text = "Hold E to open";
+                    currentChest = chest;
+                }
+            }
+            else
+            {
+                lookingAtCase = false;
+                currentChest = null;
+            }
         }
+        
         /////////////////////////
         /////////////////////////
         
@@ -52,11 +85,33 @@ public class PickUp : MonoBehaviour
             DropItem();
         }
 
-        if (Input.GetKey(KeyCode.E)) 
+        if (Input.GetKey(KeyCode.E))
         {
-            OpenCase();
+            if (!isOpeningCase && lookingAtCase && !currentChest.IsOpened)
+            {
+                // Timer starts only once when the key is initially pressed
+                holdTimer += Time.deltaTime;
+
+                // Enable the slider and update its value based on hold time
+                chestSlider.gameObject.SetActive(true);
+                chestSlider.value = Mathf.Clamp01(holdTimer / requiredHoldTime);
+                Debug.Log(chestSlider.value + " is opening case");
+            }
+
+            if (holdTimer >= requiredHoldTime)
+            {
+                OpenCase();
+            }
+        }
+        else
+        {
+            // Reset the timer and disable the slider when the key is released
+            isOpeningCase = false;
+            holdTimer = 0f;
+            chestSlider.gameObject.SetActive(false);
         }
     }
+
 
     void PickUpItem()
     {
@@ -92,9 +147,13 @@ public class PickUp : MonoBehaviour
 
     void OpenCase()
     {
-        if (Physics.Raycast(ray, out hit, pickUpRange, caseLayerMask))
+        if (currentChest != null)
         {
-             
+            chestSlider.gameObject.SetActive(false);
+            isOpeningCase = true;
+            currentChest.OpenChest();
+            holdTimer = 0f;
+            currentChest = null;
         }
     }
 }
