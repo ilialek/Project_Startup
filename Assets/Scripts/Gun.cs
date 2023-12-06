@@ -7,7 +7,7 @@ using Unity.Netcode;
 
 public class Gun : NetworkBehaviour
 {
-    public float damage = 10f;
+    public int damage = 10;
     public float range = 100f;
 
     public int amountOfBullets;
@@ -36,7 +36,7 @@ public class Gun : NetworkBehaviour
 
     AudioSource audioSource;
 
-    public PlayerScript playerScript;
+    public PlayerScript itsOwnPlayerScript;
 
     void Start()
     {
@@ -50,16 +50,20 @@ public class Gun : NetworkBehaviour
     {
         if (!IsOwner) { return; }
 
+        //if (IsLocalPlayer) { return; }
+
         ammoText.text = amountOfBulletsInMagazine.ToString() + " / " + amountOfBullets.ToString();
 
-        if (!playerScript.isSwitchingWeapons)
+        if (!itsOwnPlayerScript.isSwitchingWeapons)
         {
-            if (Input.GetMouseButton(1)) { weaponMovementScript.OnRightMouseButtonDown(); playerScript.isAiming = true; }
-            if (Input.GetMouseButtonUp(1)) { weaponMovementScript.OnRightMouseButtonUp(); playerScript.isAiming = false; }
+            if (Input.GetMouseButton(1)) { weaponMovementScript.OnRightMouseButtonDown(); itsOwnPlayerScript.isAiming = true; }
+            if (Input.GetMouseButtonUp(1)) { weaponMovementScript.OnRightMouseButtonUp(); itsOwnPlayerScript.isAiming = false; }
 
 
             if (Input.GetMouseButton(0))
             {
+                Debug.LogError("SHOOT");
+
                 if (!reloading)
                 {
                     if (Time.time >= nextTimeToFire && amountOfBulletsInMagazine > 0)
@@ -100,12 +104,35 @@ public class Gun : NetworkBehaviour
         weaponMovementScript.OnShoot();
         cameraRecoilScript.RecoilFire();
 
-        RaycastHit hit;
+        ShootServerRpc();
+
+        //RaycastHit hit;
 
         //if (Physics.Raycast(fpsCamera.transform.position, fpsCamera.transform.forward, out hit, range))
         //{
+        //    PlayerScript playerScript = hit.collider.GetComponent<PlayerScript>();
 
+        //    if (playerScript != null)
+        //    {
+        //        ShootServerRpc(playerScript);
+        //    }
         //}
+    }
+
+    [ServerRpc]
+    void ShootServerRpc() {
+        
+        RaycastHit hit;
+
+        if (Physics.Raycast(fpsCamera.transform.position, fpsCamera.transform.forward, out hit, range))
+        {
+            PlayerScript playerScript = hit.collider.GetComponent<PlayerScript>();
+
+            if (playerScript != null)
+            {
+                playerScript.TakeDamageClientRpc(damage);
+            }
+        }
     }
 
     void PlayTheSound(AudioClip audioClip, float volume)

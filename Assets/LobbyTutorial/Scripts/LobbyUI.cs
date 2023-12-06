@@ -21,7 +21,8 @@ public class LobbyUI : MonoBehaviour {
     [SerializeField] private Button changeNinjaButton;
     [SerializeField] private Button changeZombieButton;
     [SerializeField] private Button leaveLobbyButton;
-    [SerializeField] private Button changeGameModeButton;
+
+    [SerializeField] private Button startTheGameButton;
 
 
     private void Awake() {
@@ -43,8 +44,8 @@ public class LobbyUI : MonoBehaviour {
             LobbyManager.Instance.LeaveLobby();
         });
 
-        changeGameModeButton.onClick.AddListener(() => {
-            LobbyManager.Instance.ChangeGameMode();
+        startTheGameButton.onClick.AddListener(() => {
+            LobbyManager.Instance.StartTheGame();
         });
     }
 
@@ -87,7 +88,6 @@ public class LobbyUI : MonoBehaviour {
             lobbyPlayerSingleUI.UpdatePlayer(player);
         }
 
-        changeGameModeButton.gameObject.SetActive(LobbyManager.Instance.IsLobbyHost());
 
         lobbyNameText.text = lobby.Name;
         playerCountText.text = lobby.Players.Count + "/" + lobby.MaxPlayers;

@@ -6,8 +6,9 @@ using Unity.Services.Core;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
+using Unity.Netcode;
 
-public class LobbyManager : MonoBehaviour {
+public class LobbyManager : NetworkBehaviour {
 
 
     public static LobbyManager Instance { get; private set; }
@@ -16,8 +17,10 @@ public class LobbyManager : MonoBehaviour {
     public const string KEY_PLAYER_NAME = "PlayerName";
     public const string KEY_PLAYER_CHARACTER = "Character";
     public const string KEY_GAME_MODE = "GameMode";
+    public const string KEY_START_GAME = "StartGame";
 
-
+    [SerializeField] private GameObject allLobbyUI;
+    [SerializeField] private GameObject camera;
 
     public event EventHandler OnLeftLobby;
 
@@ -57,6 +60,7 @@ public class LobbyManager : MonoBehaviour {
 
     private void Awake() {
         Instance = this;
+
     }
 
     private void Update() {
@@ -126,6 +130,34 @@ public class LobbyManager : MonoBehaviour {
 
                     joinedLobby = null;
                 }
+
+                if (joinedLobby.Data[KEY_START_GAME].Value != "0") {
+                    //if (!IsLobbyHost()) {
+
+                    //    Debug.LogError("Starting Client as a client player...");
+                    //    NetworkManager.Singleton.StartClient();
+                    //}
+
+                    if (!IsLobbyHost())
+                    {
+                        Debug.Log("Starting Client as a non-host player...");
+                        try
+                        {
+                            NetworkManager.Singleton.StartClient();
+
+                            allLobbyUI.SetActive(false);
+                            camera.SetActive(false);
+                        }
+                        catch (Exception e)
+                        {
+                            Debug.LogError($"Error starting client: {e.Message}");
+                        }
+                    }
+
+                    joinedLobby = null;
+
+                    
+                }
             }
         }
     }
@@ -176,6 +208,37 @@ public class LobbyManager : MonoBehaviour {
         }
     }
 
+    public async void StartTheGame() {
+        if (IsLobbyHost())
+        {
+            try
+            {
+
+                NetworkManager.Singleton.StartHost();
+
+                Lobby lobby = await Lobbies.Instance.UpdateLobbyAsync(joinedLobby.Id, new UpdateLobbyOptions
+                {
+                    Data = new Dictionary<string, DataObject> {
+                    { KEY_START_GAME, new DataObject(DataObject.VisibilityOptions.Member, "1") }
+                }
+                });
+
+                joinedLobby = lobby;
+
+
+                allLobbyUI.SetActive(false);
+                camera.SetActive(false);
+            }
+            catch (LobbyServiceException e){
+                Debug.Log(e);
+            }
+
+
+        }
+        
+        
+    }
+
     public async void CreateLobby(string lobbyName, int maxPlayers, bool isPrivate, GameMode gameMode) {
         Player player = GetPlayer();
 
@@ -183,7 +246,8 @@ public class LobbyManager : MonoBehaviour {
             Player = player,
             IsPrivate = isPrivate,
             Data = new Dictionary<string, DataObject> {
-                { KEY_GAME_MODE, new DataObject(DataObject.VisibilityOptions.Public, gameMode.ToString()) }
+                { KEY_GAME_MODE, new DataObject(DataObject.VisibilityOptions.Public, gameMode.ToString()) },
+                { KEY_START_GAME, new DataObject(DataObject.VisibilityOptions.Member, "0") }
             }
         };
 

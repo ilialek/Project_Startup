@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using UnityEngine.UI;
 
 public class PlayerScript : NetworkBehaviour
 {
@@ -29,6 +30,14 @@ public class PlayerScript : NetworkBehaviour
 
     [Header("Other settings")]
     public Transform headTransform;
+
+    //public  NetworkVariable<int> health = new NetworkVariable<int>(100, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+
+    [SerializeField] private int health = 100;
+
+    [SerializeField] private Slider slider;
+
+    [SerializeField] private AudioListener audioListener;
 
     void Start()
     {
@@ -58,6 +67,14 @@ public class PlayerScript : NetworkBehaviour
             currentWeapon = activatedWeapon;
         }
 
+        if (!IsLocalPlayer)
+        {
+            if (audioListener != null)
+            {
+                audioListener.enabled = false;
+            }
+        }
+
         // Check if the player is the local player
         if (IsLocalPlayer)
         {
@@ -78,6 +95,8 @@ public class PlayerScript : NetworkBehaviour
     void Update()
     {
         if (!IsOwner) { return; }
+
+        slider.value = health / 100f;
 
         JumpAndDrag();
         SpeedControl();
@@ -109,24 +128,12 @@ public class PlayerScript : NetworkBehaviour
         }
     }
 
-    //void SetupPlayerCamera()
-    //{
-    //    if (!IsOwner) { return; }
-    //    if (headTransform != null)
-    //    {
-    //        // Set camera position to the head
-    //        Camera.main.transform.position = headTransform.position;
+    [ClientRpc]
+    public void TakeDamageClientRpc(int damage)
+    {
+        health -= damage;
+    }
 
-    //        Camera.main.transform.LookAt(transform.position + transform.forward * 30);
-
-    //        // Set the player as the parent of the camera
-    //        Camera.main.transform.parent = headTransform;
-    //    }
-    //    else
-    //    {
-    //        Debug.LogError("Head transform not found. Please ensure the 'Head' transform exists.");
-    //    }
-    //}
 
     public void SwitchWeapons()
     {
