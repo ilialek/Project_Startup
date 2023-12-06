@@ -76,16 +76,16 @@ public class PlayerScript : NetworkBehaviour
         }
 
         // Check if the player is the local player
-        if (IsLocalPlayer)
-        {
-            // Enable the camera for the local player
-            playerCamera.enabled = true;
-        }
-        else
-        {
-            // Disable the camera for non-local players
-            playerCamera.enabled = false;
-        }
+        //if (IsLocalPlayer)
+        //{
+        //    // Enable the camera for the local player
+        //    playerCamera.enabled = true;
+        //}
+        //else
+        //{
+        //    // Disable the camera for non-local players
+        //    playerCamera.enabled = false;
+        //}
 
         //SetupPlayerCamera();
 
@@ -118,15 +118,15 @@ public class PlayerScript : NetworkBehaviour
         GroundMovement();
     }
 
-    public override void OnGainedOwnership()
-    {
-        // Called when the local player gains ownership of the object
-        if (IsLocalPlayer)
-        {
-            // Enable the camera for the local player
-            playerCamera.enabled = true;
-        }
-    }
+    //public override void OnGainedOwnership()
+    //{
+    //    // Called when the local player gains ownership of the object
+    //    if (IsLocalPlayer)
+    //    {
+    //        // Enable the camera for the local player
+    //        playerCamera.enabled = true;
+    //    }
+    //}
 
     [ClientRpc]
     public void TakeDamageClientRpc(int damage)

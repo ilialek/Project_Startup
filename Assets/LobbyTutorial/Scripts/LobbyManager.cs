@@ -8,10 +8,15 @@ using Unity.Services.Lobbies.Models;
 using UnityEngine;
 using Unity.Netcode;
 
+using Unity.Netcode.Transports.UTP;
+using System.Net;
+using System.Net.Sockets;
+
 public class LobbyManager : NetworkBehaviour {
 
 
     public static LobbyManager Instance { get; private set; }
+
 
 
     public const string KEY_PLAYER_NAME = "PlayerName";
@@ -146,7 +151,7 @@ public class LobbyManager : NetworkBehaviour {
                             NetworkManager.Singleton.StartClient();
 
                             allLobbyUI.SetActive(false);
-                            camera.SetActive(false);
+                            //camera.SetActive(false);
                         }
                         catch (Exception e)
                         {
@@ -216,6 +221,8 @@ public class LobbyManager : NetworkBehaviour {
 
                 NetworkManager.Singleton.StartHost();
 
+          
+
                 Lobby lobby = await Lobbies.Instance.UpdateLobbyAsync(joinedLobby.Id, new UpdateLobbyOptions
                 {
                     Data = new Dictionary<string, DataObject> {
@@ -227,7 +234,7 @@ public class LobbyManager : NetworkBehaviour {
 
 
                 allLobbyUI.SetActive(false);
-                camera.SetActive(false);
+                //camera.SetActive(false);
             }
             catch (LobbyServiceException e){
                 Debug.Log(e);
@@ -238,6 +245,8 @@ public class LobbyManager : NetworkBehaviour {
         
         
     }
+
+   
 
     public async void CreateLobby(string lobbyName, int maxPlayers, bool isPrivate, GameMode gameMode) {
         Player player = GetPlayer();
