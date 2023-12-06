@@ -62,7 +62,7 @@ public class Gun : NetworkBehaviour
 
             if (Input.GetMouseButton(0))
             {
-                Debug.LogError("SHOOT");
+                //Debug.LogError("SHOOT");
 
                 if (!reloading)
                 {

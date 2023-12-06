@@ -118,15 +118,15 @@ public class PlayerScript : NetworkBehaviour
         GroundMovement();
     }
 
-    public override void OnGainedOwnership()
-    {
-        // Called when the local player gains ownership of the object
-        if (IsLocalPlayer)
-        {
-            // Enable the camera for the local player
-            playerCamera.enabled = true;
-        }
-    }
+    //public override void OnGainedOwnership()
+    //{
+    //    // Called when the local player gains ownership of the object
+    //    if (IsLocalPlayer)
+    //    {
+    //        // Enable the camera for the local player
+    //        playerCamera.enabled = true;
+    //    }
+    //}
 
     [ClientRpc]
     public void TakeDamageClientRpc(int damage)
