@@ -27,6 +27,7 @@ public class PickUp : MonoBehaviour
 
     public bool lookingAtItem = false;
     public bool lookingAtCase = false;
+
     void Start()
     {
         UnityEngine.Cursor.lockState = CursorLockMode.Locked;
@@ -46,30 +47,33 @@ public class PickUp : MonoBehaviour
         if (Physics.Raycast(ray, out hit, pickUpRange, pickUpLayerMask))
         {
             lookingAtItem = true;
-            guideText.text = "Press E to pick up";          
+            guideText.text = "Press E to pick up";
+            //Debug.Log("is looking at an item");
         }
         else
         {
             lookingAtItem = false;
+            //Debug.Log("is NOT looking at an item");
         }
 
         if (Physics.Raycast(ray, out hit, pickUpRange, caseLayerMask))
-        {
-            lookingAtCase = true;
+        {        
             Chest chest = hit.transform.GetComponent<Chest>();
-            if (chest != null ) 
+            if (chest != null) 
             {
                 if(!chest.IsOpened) 
                 {
-                   
+                    lookingAtCase = true;
                     guideText.text = "Hold E to open";
                     currentChest = chest;
+                    Debug.Log("is looking at a case");
                 }
             }
             else
             {
                 lookingAtCase = false;
                 currentChest = null;
+                Debug.Log("it is NOT looking at a case");
             }
         }
         
@@ -85,30 +89,25 @@ public class PickUp : MonoBehaviour
             DropItem();
         }
 
-        if (Input.GetKey(KeyCode.E))
-        {
-            if (!isOpeningCase && lookingAtCase && !currentChest.IsOpened)
-            {
-                // Timer starts only once when the key is initially pressed
-                holdTimer += Time.deltaTime;
-
-                // Enable the slider and update its value based on hold time
-                chestSlider.gameObject.SetActive(true);
-                chestSlider.value = Mathf.Clamp01(holdTimer / requiredHoldTime);
-                Debug.Log(chestSlider.value + " is opening case");
-            }
-
-            if (holdTimer >= requiredHoldTime)
-            {
-                OpenCase();
-            }
+        if (Input.GetKey(KeyCode.E) && lookingAtCase && !currentChest.IsOpened)
+        {      
+            // Timer starts only once when the key is initially pressed
+            holdTimer += Time.deltaTime;
+            // Enable the slider and update its value based on hold time
+            chestSlider.gameObject.SetActive(true);
+            chestSlider.value = Mathf.Clamp01(holdTimer / requiredHoldTime);
+            Debug.Log(chestSlider.value + " is opening case");
         }
         else
         {
-            // Reset the timer and disable the slider when the key is released
-            isOpeningCase = false;
+            // Reset the timer and disable the slider when the key is released               
             holdTimer = 0f;
             chestSlider.gameObject.SetActive(false);
+            chestSlider.value = 0;
+        }
+        if (holdTimer >= requiredHoldTime)
+        {
+            OpenCase();
         }
     }
 
@@ -150,7 +149,6 @@ public class PickUp : MonoBehaviour
         if (currentChest != null)
         {
             chestSlider.gameObject.SetActive(false);
-            isOpeningCase = true;
             currentChest.OpenChest();
             holdTimer = 0f;
             currentChest = null;
