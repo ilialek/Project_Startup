@@ -94,8 +94,8 @@ public class PickUp : MonoBehaviour
             DropItem();
         }
 
-        if (Input.GetKey(KeyCode.E) && lookingAtCase && !currentChest.IsOpened)
-        {      
+        if (Input.GetKey(KeyCode.E) && lookingAtCase && currentChest != null && !currentChest.IsOpened)
+        {
             // Timer starts only once when the key is initially pressed
             holdTimer += Time.deltaTime;
             // Enable the slider and update its value based on hold time
@@ -110,10 +110,10 @@ public class PickUp : MonoBehaviour
             chestSlider.gameObject.SetActive(false);
             chestSlider.value = 0;
         }
+
         if (holdTimer >= requiredHoldTime)
         {
             isOpeningChest = true;
-            
             OpenCase();
         }
     }

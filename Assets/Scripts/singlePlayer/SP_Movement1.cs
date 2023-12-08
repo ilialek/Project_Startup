@@ -50,7 +50,7 @@ public class SP_Movement1 : MonoBehaviour
 
         if (numberOfActivatedWeapons > 1 || numberOfActivatedWeapons == 0)
         {
-            Debug.LogError("More than 2 weapons are activated or none");
+            //Debug.LogError("More than 2 weapons are activated or none");
         }
         else if (numberOfActivatedWeapons == 1)
         {
