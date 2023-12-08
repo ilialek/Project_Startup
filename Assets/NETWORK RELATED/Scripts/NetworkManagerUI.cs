@@ -69,6 +69,17 @@ public class NetworkManagerUI : MonoBehaviour
 	[SerializeField] string ipAddress;
 	[SerializeField] UnityTransport transport;
 
+	//    [SerializeField] private Button serverButton;
+//    [SerializeField] private Button hostButton;
+//    [SerializeField] private Button clientButton;
+
+//    void Awake()
+//    {
+//        serverButton.onClick.AddListener(() => { NetworkManager.Singleton.StartServer(); });
+//        hostButton.onClick.AddListener(() => { Do(); });
+//        clientButton.onClick.AddListener(() => { NetworkManager.Singleton.StartClient(); });
+//    }
+
 	void Start()
 	{
 		ipAddress = "0.0.0.0";

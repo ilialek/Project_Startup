@@ -4,6 +4,7 @@ using Unity.VisualScripting;
 using System;
 using UnityEngine.UI;
 
+
 public class PickUp : MonoBehaviour 
 {
     public float pickUpRange = 3.0f;
@@ -19,6 +20,7 @@ public class PickUp : MonoBehaviour
     public TMP_Text guideText;
     private Ray ray;
     private RaycastHit hit;
+
     private bool isOpeningCase = false;
     private float holdTimer;
     private float requiredHoldTime = 1.5f;
@@ -28,10 +30,13 @@ public class PickUp : MonoBehaviour
     public bool lookingAtItem = false;
     public bool lookingAtCase = false;
 
+    private bool isOpeningChest = false;
+
+
     void Start()
     {
-        UnityEngine.Cursor.lockState = CursorLockMode.Locked;
-        UnityEngine.Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
         playerCamera = GetComponentInChildren<Camera>();
         chestSlider.gameObject.SetActive(false);
     }
@@ -107,6 +112,8 @@ public class PickUp : MonoBehaviour
         }
         if (holdTimer >= requiredHoldTime)
         {
+            isOpeningChest = true;
+            
             OpenCase();
         }
     }
@@ -152,6 +159,13 @@ public class PickUp : MonoBehaviour
             currentChest.OpenChest();
             holdTimer = 0f;
             currentChest = null;
+
+            GameObject selectedCase = hit.transform.gameObject;
+
+            if (selectedCase != null) 
+            {
+
+            }
         }
     }
 }

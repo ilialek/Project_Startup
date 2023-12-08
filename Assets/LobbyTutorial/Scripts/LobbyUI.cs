@@ -16,13 +16,16 @@ public class LobbyUI : MonoBehaviour {
     [SerializeField] private Transform container;
     [SerializeField] private TextMeshProUGUI lobbyNameText;
     [SerializeField] private TextMeshProUGUI playerCountText;
-    [SerializeField] private TextMeshProUGUI gameModeText;
+    //[SerializeField] private TextMeshProUGUI ipAddressText;
     [SerializeField] private Button changeMarineButton;
     [SerializeField] private Button changeNinjaButton;
     [SerializeField] private Button changeZombieButton;
     [SerializeField] private Button leaveLobbyButton;
 
     [SerializeField] private Button startTheGameButton;
+
+    [SerializeField] private Button playerReadyButton;
+    [SerializeField] private Button playerNotReadyButton;
 
 
     private void Awake() {
@@ -47,6 +50,15 @@ public class LobbyUI : MonoBehaviour {
         startTheGameButton.onClick.AddListener(() => {
             LobbyManager.Instance.StartTheGame();
         });
+
+        playerReadyButton.onClick.AddListener(() => {
+            LobbyManager.Instance.UpdatePlayerReadiness("Ready");
+        });
+
+        playerNotReadyButton.onClick.AddListener(() => {
+            LobbyManager.Instance.UpdatePlayerReadiness("Not ready");
+        });
+
     }
 
     private void Start() {
@@ -55,6 +67,7 @@ public class LobbyUI : MonoBehaviour {
         LobbyManager.Instance.OnLobbyGameModeChanged += UpdateLobby_Event;
         LobbyManager.Instance.OnLeftLobby += LobbyManager_OnLeftLobby;
         LobbyManager.Instance.OnKickedFromLobby += LobbyManager_OnLeftLobby;
+
 
         Hide();
     }
@@ -85,15 +98,34 @@ public class LobbyUI : MonoBehaviour {
                 player.Id != AuthenticationService.Instance.PlayerId // Don't allow kick self
             );
 
+            lobbyPlayerSingleUI.SetReadinessTextVisible(
+                LobbyManager.Instance.IsLobbyHost() &&
+                player.Id != AuthenticationService.Instance.PlayerId
+            );
+
             lobbyPlayerSingleUI.UpdatePlayer(player);
         }
 
 
+        DisableStartButton(LobbyManager.Instance.IsLobbyHost());
+        DisableReadinessButtons(LobbyManager.Instance.IsLobbyHost());
+
         lobbyNameText.text = lobby.Name;
         playerCountText.text = lobby.Players.Count + "/" + lobby.MaxPlayers;
-        gameModeText.text = lobby.Data[LobbyManager.KEY_GAME_MODE].Value;
+
+        //ipAddressText.text = lobby.Data[LobbyManager.KEY_IP_ADDRESS].Value;
 
         Show();
+    }
+
+    private void DisableStartButton(bool visible) {
+        startTheGameButton.gameObject.SetActive(visible);
+    }
+
+    private void DisableReadinessButtons(bool visible)
+    {
+        playerReadyButton.gameObject.SetActive(!visible);
+        playerNotReadyButton.gameObject.SetActive(!visible);
     }
 
     private void ClearLobby() {

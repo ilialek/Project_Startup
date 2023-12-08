@@ -9,6 +9,7 @@ using UnityEngine;
 using Unity.Netcode;
 
 using Unity.Netcode.Transports.UTP;
+using TMPro;
 using System.Net;
 using System.Net.Sockets;
 
@@ -17,12 +18,12 @@ public class LobbyManager : NetworkBehaviour {
 
     public static LobbyManager Instance { get; private set; }
 
-
-
     public const string KEY_PLAYER_NAME = "PlayerName";
     public const string KEY_PLAYER_CHARACTER = "Character";
     public const string KEY_GAME_MODE = "GameMode";
     public const string KEY_START_GAME = "StartGame";
+    public const string KEY_IP_ADDRESS = "IPAddress";
+    public const string KEY_PLAYER_READINESS = "PlayerReadiness";
 
     [SerializeField] private GameObject allLobbyUI;
     [SerializeField] private GameObject camera;
@@ -151,7 +152,7 @@ public class LobbyManager : NetworkBehaviour {
                             NetworkManager.Singleton.StartClient();
 
                             allLobbyUI.SetActive(false);
-                            //camera.SetActive(false);
+                            camera.SetActive(false);
                         }
                         catch (Exception e)
                         {
@@ -190,7 +191,8 @@ public class LobbyManager : NetworkBehaviour {
     private Player GetPlayer() {
         return new Player(AuthenticationService.Instance.PlayerId, null, new Dictionary<string, PlayerDataObject> {
             { KEY_PLAYER_NAME, new PlayerDataObject(PlayerDataObject.VisibilityOptions.Public, playerName) },
-            { KEY_PLAYER_CHARACTER, new PlayerDataObject(PlayerDataObject.VisibilityOptions.Public, PlayerCharacter.Marine.ToString()) }
+            { KEY_PLAYER_CHARACTER, new PlayerDataObject(PlayerDataObject.VisibilityOptions.Public, PlayerCharacter.Marine.ToString()) },
+            { KEY_PLAYER_READINESS, new PlayerDataObject(PlayerDataObject.VisibilityOptions.Public, "Not ready") }
         });
     }
 
@@ -218,10 +220,7 @@ public class LobbyManager : NetworkBehaviour {
         {
             try
             {
-
                 NetworkManager.Singleton.StartHost();
-
-          
 
                 Lobby lobby = await Lobbies.Instance.UpdateLobbyAsync(joinedLobby.Id, new UpdateLobbyOptions
                 {
@@ -232,9 +231,8 @@ public class LobbyManager : NetworkBehaviour {
 
                 joinedLobby = lobby;
 
-
                 allLobbyUI.SetActive(false);
-                //camera.SetActive(false);
+                camera.SetActive(false);
             }
             catch (LobbyServiceException e){
                 Debug.Log(e);
@@ -256,7 +254,8 @@ public class LobbyManager : NetworkBehaviour {
             IsPrivate = isPrivate,
             Data = new Dictionary<string, DataObject> {
                 { KEY_GAME_MODE, new DataObject(DataObject.VisibilityOptions.Public, gameMode.ToString()) },
-                { KEY_START_GAME, new DataObject(DataObject.VisibilityOptions.Member, "0") }
+                { KEY_START_GAME, new DataObject(DataObject.VisibilityOptions.Member, "0") },
+                { KEY_IP_ADDRESS, new DataObject(DataObject.VisibilityOptions.Member, "0.0.0.0") }
             }
         };
 
@@ -266,7 +265,45 @@ public class LobbyManager : NetworkBehaviour {
 
         OnJoinedLobby?.Invoke(this, new LobbyEventArgs { lobby = lobby });
 
-        Debug.Log("Created Lobby " + lobby.Name);
+        GetLocalIPAddress();
+
+        //Debug.Log("Created Lobby " + lobby.Name + " With IP: " + lobby.Data[LobbyManager.KEY_IP_ADDRESS].Value);
+    }
+
+    public async void GetLocalIPAddress()
+    {
+        var host = Dns.GetHostEntry(Dns.GetHostName());
+        foreach (var ip in host.AddressList)
+        {
+            if (ip.AddressFamily == AddressFamily.InterNetwork)
+            {
+                //ipAddressText.text = ip.ToString();
+                //ipAddress = ip.ToString();
+                //return ip.ToString();
+
+                Lobby lobby = await Lobbies.Instance.UpdateLobbyAsync(joinedLobby.Id, new UpdateLobbyOptions
+                {
+                    Data = new Dictionary<string, DataObject> {
+                    { KEY_IP_ADDRESS, new DataObject(DataObject.VisibilityOptions.Member, ip.ToString()) }
+                }
+                });
+
+                Debug.Log("Created Lobby " + lobby.Name + " With IP: " + lobby.Data[LobbyManager.KEY_IP_ADDRESS].Value);
+            }
+        }
+        //throw new System.Exception("No network adapters with an IPv4 address in the system!");
+    }
+
+    public void SetIpAddress(string ipAddress)
+    {
+        if (!IsLobbyHost())
+        {
+            UnityTransport transport;
+            transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
+            transport.ConnectionData.Address = ipAddress;
+
+            Debug.Log("IP is set. Value: " + ipAddress);
+        }
     }
 
     public async void RefreshLobbyList() {
@@ -316,7 +353,23 @@ public class LobbyManager : NetworkBehaviour {
             Player = player
         });
 
+        
+
         OnJoinedLobby?.Invoke(this, new LobbyEventArgs { lobby = lobby });
+
+        Debug.Log("Joined Lobby " + lobby.Name + " With IP: " + joinedLobby.Data[KEY_IP_ADDRESS].Value);
+
+        SetIpAddress(joinedLobby.Data[KEY_IP_ADDRESS].Value);
+
+        //if (lobby.Data.TryGetValue(KEY_IP_ADDRESS, out var ipAddressDataObject))
+        //{
+        //    SetIpAddress(ipAddressDataObject.Value);
+        //}
+        //else
+        //{
+        //    Debug.LogError("Key 'IPAddress' not present in the lobby data");
+        //    // Handle the absence of the 'IPAddress' key accordingly
+        //}
     }
 
     public async void UpdatePlayerName(string playerName) {
@@ -366,6 +419,36 @@ public class LobbyManager : NetworkBehaviour {
 
                 OnJoinedLobbyUpdate?.Invoke(this, new LobbyEventArgs { lobby = joinedLobby });
             } catch (LobbyServiceException e) {
+                Debug.Log(e);
+            }
+        }
+    }
+
+    public async void UpdatePlayerReadiness(string playerReadiness) {
+
+        if (joinedLobby != null) {
+
+            try {
+
+                UpdatePlayerOptions options = new UpdatePlayerOptions();
+
+                options.Data = new Dictionary<string, PlayerDataObject>() {
+                    {
+                        KEY_PLAYER_READINESS, new PlayerDataObject(
+                            visibility: PlayerDataObject.VisibilityOptions.Public,
+                            value: playerReadiness.ToString())
+                    }
+                };
+
+                string playerId = AuthenticationService.Instance.PlayerId;
+
+                Lobby lobby = await LobbyService.Instance.UpdatePlayerAsync(joinedLobby.Id, playerId, options);
+                joinedLobby = lobby;
+
+                OnJoinedLobbyUpdate?.Invoke(this, new LobbyEventArgs { lobby = joinedLobby });
+            }
+            catch (LobbyServiceException e)
+            {
                 Debug.Log(e);
             }
         }
