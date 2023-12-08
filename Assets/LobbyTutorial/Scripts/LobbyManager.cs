@@ -151,7 +151,7 @@ public class LobbyManager : NetworkBehaviour {
                             NetworkManager.Singleton.StartClient();
 
                             allLobbyUI.SetActive(false);
-                            //camera.SetActive(false);
+                            camera.SetActive(false);
                         }
                         catch (Exception e)
                         {
@@ -234,7 +234,7 @@ public class LobbyManager : NetworkBehaviour {
 
 
                 allLobbyUI.SetActive(false);
-                //camera.SetActive(false);
+                camera.SetActive(false);
             }
             catch (LobbyServiceException e){
                 Debug.Log(e);
