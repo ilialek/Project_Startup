@@ -8,18 +8,18 @@ TagManager:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Wall To Destroy
   - Water
   - UI
   - Ground
   - Weapon
   - Item
   - Case
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Glass
+  - Wall Piece
+  - Environment
+  - Suitcase
+  - Player
   - 
   - 
   - 
