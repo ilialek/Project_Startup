@@ -12,6 +12,8 @@ public class LobbyPlayerSingleUI : MonoBehaviour {
     [SerializeField] private Image characterImage;
     [SerializeField] private Button kickPlayerButton;
 
+    [SerializeField] private TextMeshProUGUI playerReadinessText;
+
 
     private Player player;
 
@@ -24,12 +26,22 @@ public class LobbyPlayerSingleUI : MonoBehaviour {
         kickPlayerButton.gameObject.SetActive(visible);
     }
 
+    public void SetReadinessTextVisible(bool visible)
+    {
+        playerReadinessText.gameObject.SetActive(!visible);
+    }
+
     public void UpdatePlayer(Player player) {
         this.player = player;
         playerNameText.text = player.Data[LobbyManager.KEY_PLAYER_NAME].Value;
         LobbyManager.PlayerCharacter playerCharacter = 
             System.Enum.Parse<LobbyManager.PlayerCharacter>(player.Data[LobbyManager.KEY_PLAYER_CHARACTER].Value);
         characterImage.sprite = LobbyAssets.Instance.GetSprite(playerCharacter);
+
+        if (!LobbyManager.Instance.IsLobbyHost()) {
+            playerReadinessText.text = player.Data[LobbyManager.KEY_PLAYER_READINESS].Value;
+        }
+        
     }
 
     private void KickPlayer() {

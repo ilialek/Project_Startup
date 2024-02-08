@@ -23,19 +23,7 @@ public class EditPlayerName : MonoBehaviour {
     private void Awake() {
         Instance = this;
 
-        GetComponent<Button>().onClick.AddListener(() => {
-            UI_InputWindow.Show_Static("Player Name", playerName, "abcdefghijklmnopqrstuvxywzABCDEFGHIJKLMNOPQRSTUVXYWZ .,-", 20,
-            () => {
-                // Cancel
-            },
-            (string newName) => {
-                playerName = newName;
-
-                playerNameText.text = playerName;
-
-                OnNameChanged?.Invoke(this, EventArgs.Empty);
-            });
-        });
+        GetComponent<Button>().onClick.AddListener(() => { UI_InputWindow.Show_Static("Player Name", playerName, "abcdefghijklmnopqrstuvxywzABCDEFGHIJKLMNOPQRSTUVXYWZ .,-", 15, () => { },(string newName) => {playerName = newName;playerNameText.text = playerName;OnNameChanged?.Invoke(this, EventArgs.Empty);});});
 
         playerNameText.text = playerName;
     }
