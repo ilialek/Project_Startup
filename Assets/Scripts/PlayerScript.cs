@@ -76,7 +76,11 @@ public class PlayerScript : NetworkBehaviour
         }
 
         // Check if the player is the local player
+ HEAD
        if (IsLocalPlayer)
+=======
+        if (IsLocalPlayer)
+ 096a88d4b1bafc2391bf7987bfef254ce57822f4
         {
             // Enable the camera for the local player
             playerCamera.enabled = true;
@@ -118,9 +122,15 @@ public class PlayerScript : NetworkBehaviour
         GroundMovement();
     }
 
+ HEAD
    public override void OnGainedOwnership()
    {
        // Called when the local player gains ownership of the object
+=======
+    public override void OnGainedOwnership()
+    {
+        // Called when the local player gains ownership of the object
+ 096a88d4b1bafc2391bf7987bfef254ce57822f4
         if (IsLocalPlayer)
         {
             // Enable the camera for the local player
