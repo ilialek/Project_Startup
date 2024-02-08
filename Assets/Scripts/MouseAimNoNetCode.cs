@@ -10,9 +10,13 @@ public class MouseAimNoNetCode : MonoBehaviour
 
     public Transform playerBody;
 
+    public float detectRange = 5f;
+    public GameObject indicationText;
+
     void Awake()
     {
         Cursor.lockState = CursorLockMode.Locked;
+        indicationText.SetActive(false);
 
         //if (IsOwner)
         //{
@@ -23,8 +27,6 @@ public class MouseAimNoNetCode : MonoBehaviour
 
     void Update()
     {
-
-
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
 
@@ -33,5 +35,23 @@ public class MouseAimNoNetCode : MonoBehaviour
 
         transform.localRotation = Quaternion.Euler(xRotation, 0f, transform.localRotation.z);
         playerBody.Rotate(Vector3.up * mouseX);
+
+        DetectLookAtSuitcase();
+    }
+
+    private void DetectLookAtSuitcase()
+    {
+        indicationText.SetActive(false);
+
+        Ray ray = new Ray (transform.position, transform.forward);
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit, detectRange))
+        {
+            if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Suitcase"))
+            {
+                indicationText.gameObject.SetActive(true);
+            }
+        }
     }
 }

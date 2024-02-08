@@ -31,7 +31,7 @@ public class GeneralGunScript : MonoBehaviour
     public void OnSwitch()
     {
         playerScript.SwitchWeapons();
-        //gameObject.SetActive(false);
+        gameObject.SetActive(false);
         animator.SetBool("isEquipped", true);
         //otherGun.SetActive(true);
     }
