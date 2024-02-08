@@ -194,6 +194,17 @@ public class LobbyManager : NetworkBehaviour {
             { KEY_PLAYER_CHARACTER, new PlayerDataObject(PlayerDataObject.VisibilityOptions.Public, PlayerCharacter.Marine.ToString()) },
             { KEY_PLAYER_READINESS, new PlayerDataObject(PlayerDataObject.VisibilityOptions.Public, "Not ready") }
         });
+
+    }
+
+    private Player GetHostPlayer()
+    {
+        return new Player(AuthenticationService.Instance.PlayerId, null, new Dictionary<string, PlayerDataObject> {
+            { KEY_PLAYER_NAME, new PlayerDataObject(PlayerDataObject.VisibilityOptions.Public, playerName) },
+            { KEY_PLAYER_CHARACTER, new PlayerDataObject(PlayerDataObject.VisibilityOptions.Public, PlayerCharacter.Marine.ToString()) },
+            { KEY_PLAYER_READINESS, new PlayerDataObject(PlayerDataObject.VisibilityOptions.Public, "") }
+        });
+
     }
 
     public void ChangeGameMode() {
@@ -216,7 +227,7 @@ public class LobbyManager : NetworkBehaviour {
     }
 
     public async void StartTheGame() {
-        if (IsLobbyHost())
+        if (IsLobbyHost() && ArePlayersReady(GetJoinedLobby()))
         {
             try
             {
@@ -244,10 +255,29 @@ public class LobbyManager : NetworkBehaviour {
         
     }
 
-   
+    private bool ArePlayersReady(Lobby lobby)
+    {
+        int readyPlayers = 0;
+
+        foreach (Player player in lobby.Players)
+        {
+            if (player.Data[KEY_PLAYER_READINESS].Value == "Ready")
+            {
+                readyPlayers++;
+            }
+        }
+
+        if (readyPlayers == lobby.Players.Count - 1)
+        {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
 
     public async void CreateLobby(string lobbyName, int maxPlayers, bool isPrivate, GameMode gameMode) {
-        Player player = GetPlayer();
+        Player player = GetHostPlayer();
 
         CreateLobbyOptions options = new CreateLobbyOptions {
             Player = player,

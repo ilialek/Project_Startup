@@ -14,6 +14,8 @@ public class LobbyPlayerSingleUI : MonoBehaviour {
 
     [SerializeField] private TextMeshProUGUI playerReadinessText;
 
+    [SerializeField] private Color greenColor;
+    [SerializeField] private Color redColor;
 
     private Player player;
 
@@ -38,10 +40,20 @@ public class LobbyPlayerSingleUI : MonoBehaviour {
             System.Enum.Parse<LobbyManager.PlayerCharacter>(player.Data[LobbyManager.KEY_PLAYER_CHARACTER].Value);
         characterImage.sprite = LobbyAssets.Instance.GetSprite(playerCharacter);
 
-        if (!LobbyManager.Instance.IsLobbyHost()) {
-            playerReadinessText.text = player.Data[LobbyManager.KEY_PLAYER_READINESS].Value;
-        }
-        
+        playerReadinessText.text = player.Data[LobbyManager.KEY_PLAYER_READINESS].Value;
+
+        //if (player.Data[LobbyManager.KEY_PLAYER_READINESS].Value == "Ready")
+        //{
+        //    playerReadinessText.color = greenColor;
+        //    playerReadinessText.text = player.Data[LobbyManager.KEY_PLAYER_READINESS].Value;
+        //}
+        //else if (player.Data[LobbyManager.KEY_PLAYER_READINESS].Value == "Not ready")
+        //{
+        //    playerReadinessText.color = redColor;
+        //    playerReadinessText.text = player.Data[LobbyManager.KEY_PLAYER_READINESS].Value;
+        //}
+
+
     }
 
     private void KickPlayer() {

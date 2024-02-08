@@ -98,10 +98,10 @@ public class LobbyUI : MonoBehaviour {
                 player.Id != AuthenticationService.Instance.PlayerId // Don't allow kick self
             );
 
-            lobbyPlayerSingleUI.SetReadinessTextVisible(
-                LobbyManager.Instance.IsLobbyHost() &&
-                player.Id != AuthenticationService.Instance.PlayerId
-            );
+            //lobbyPlayerSingleUI.SetReadinessTextVisible(
+            //    LobbyManager.Instance.IsLobbyHost() &&
+            //    player.Id != AuthenticationService.Instance.PlayerId
+            //);
 
             lobbyPlayerSingleUI.UpdatePlayer(player);
         }
