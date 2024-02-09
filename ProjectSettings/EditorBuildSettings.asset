@@ -6,12 +6,15 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/MainMenu.unity
+    guid: ef8883d323a28d94194f90060d26090d
+  - enabled: 1
+    path: Assets/Scenes/ILIA'S SCENE.unity
+    guid: 9ac16d327bb1a4a5f96d159e9b92061d
+  - enabled: 1
     path: Assets/Scenes/NetworkScene.unity
     guid: 18a65da1cd7eb45db9837b92601c0d43
-  - enabled: 0
-    path: Assets/Scenes/LobbyTutorial_Done.unity
-    guid: be8200a558cfff84b8ce074fa6e33558
-  - enabled: 0
-    path: Assets/Scenes/SampleScene.unity
-    guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 1
+    path: Assets/Scenes/test.unity
+    guid: 900768ffce0ea904798249316d8af3c2
   m_configObjects: {}
